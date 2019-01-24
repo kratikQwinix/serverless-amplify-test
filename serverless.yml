@@ -1,0 +1,56 @@
+service: serverless-test-app
+
+provider:
+  name: aws
+  runtime: nodejs8.10
+  # IAM role statements so that services can be accessed in the AWS account
+  # iamRoleStatements:
+  #   - Effect: "Allow"
+  #     Action:
+  #       - "cognito-idp:AdminCreateUser"
+  #       - "cognito-idp:ListUsers"
+  #     Resource:
+  #       Fn::Join:
+  #         - ""
+  #         - - "arn:aws:cognito-idp:::"
+  # - Ref: ServerlessDeploymentBucket
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-offline
+  # - aws-amplify-serverless-plugin
+
+functions:
+  createUser:
+    handler: src/users.create
+    events:
+      - http:
+          path: users
+          method: post
+          cors: true
+          integration: lambda
+          response:
+            headers:
+              Access-Control-Allow-Origin: "'*'"
+# custom:
+#   amplify:
+#     - filename: src/aws-exports.js
+#       type: javascript
+#       appClient: WebUserPoolClient
+
+# resources:
+#   Resources:
+#     # Amazon Cognito user pool
+#     UserPool:
+#       Type: "AWS::Cognito::UserPool"
+#       Description: "An Amazon Cognito user pool for authenticating users"
+#       Properties:
+#         UserPoolName: insuranceBotTest
+
+#     WebUserPoolClient:
+#       Type: "AWS::Cognito::UserPoolClient"
+#       Description: "App Client for Web Usage"
+#       Properties:
+#         ClientName: insurance-chat-bot
+#         GenerateSecret: false
+#         UserPoolId: { Ref: UserPool }
